@@ -1,0 +1,22 @@
+IMAGEMAGICK
+===========
+
+* prepare overlays
+  - must be output png
+composite DW-ANKHMORPORK.bmp DW-ANKHMORPORK-LadyRamkinsDragonSanctuary.bmp -compose change-mask OUTFILE.png
+
+for BMPFILE in DW-ANKHMORPORK-*.bmp ; do
+    BN=$(basename $BMPFILE .bmp)
+    echo $BN
+    composite DW-ANKHMORPORK.bmp $BMPFILE -compose change-mask DIFF.$BN.png
+done
+
+* overlay images
+composite DIFF.DW-ANKHMORPORK-LadyRamkinsDragonSanctuary.png DW-ANKHMORPORK.bmp OUTFILE.png
+
+convert DW-ANKHMORPORK.bmp DW-ANKHMORPORK.png
+for BMPFILE in DW-ANKHMORPORK-*.bmp ; do
+    BN=$(basename $BMPFILE .bmp)
+    echo $BN
+    composite DIFF.$BN.png DW-ANKHMORPORK.png DW-ANKHMORPORK.png
+done

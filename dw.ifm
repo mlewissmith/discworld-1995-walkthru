@@ -1,0 +1,136 @@
+title "Discworld";
+
+style PATH;
+room_colour = "light gray";
+endstyle PATH;
+
+
+################################################################################
+## MAP: UNSEEN UNIVERSITY
+map "Unseen University";
+
+room "Rincewind's Room" tag rUU_RincewindRoom
+     start ;
+item "Pouch" tag iPouch
+     hidden in rUU_RincewindRoom
+     note "In the wardrobe";
+item "Luggage" tag iLuggage
+     in rUU_RincewindRoom
+     keep;
+item "Banana" tag iBanana
+     hidden in rUU_RincewindRoom
+     need iLuggage
+     note "Hidden in Luggage";
+task "Poke Luggage" tag tPokeLuggage
+     need iBroom
+     give iLuggage
+     give iBanana;
+
+room "Stairs" tag rUU_StairsTop
+     style PATH
+     dir s from rUU_RincewindRoom;
+
+room "Stairs" tag rUU_StairsBottom
+     style PATH
+     dir s s ;
+
+room "Archchancellor's Room" tag rUU_ArchchancellorsRoom
+     dir w w from rUU_StairsTop;
+task "Talk to Archchancellor" tag tArchchancellorQuest_1
+     note "'...fetch me a copy of Featherwinkle's Concise Compendium of Dragon's Lairs'";
+task "Give Book to Archchancellor" tag ACT_1_MAINQUEST
+     need iCompendium
+     note "Staff"
+     note "Imp"
+     note "Dragon breath"
+     note "Magic coil (hair curler)"
+     note "Metal container (frying pan)";
+
+room "Dining Room" tag rUU_DiningRoom
+     dir ne from rUU_StairsBottom;
+item "Staff" tag iStaff
+     in rUU_DiningRoom ;
+task "Swap Broom for Staff" tag tGetStaff
+     after ACT_1_MAINQUEST
+     need iBroom lose it;
+
+room "Kitchen" tag rUU_Kitchen
+     dir se from rUU_StairsBottom;
+
+room "Hall" tag rUU_Hall
+     style PATH
+     dir w w from rUU_StairsBottom;
+
+room "Closet" tag rUU_Closet
+     dir nw from  rUU_Hall;
+item "Broom" tag iBroom
+     in rUU_Closet;
+
+room "Library" tag rUU_Library
+     dir ne from rUU_Hall;
+item "Book" tag iCompendium
+     hidden in rUU_Library
+     note "Featherwinkle's Concise Compendium of Dragon's Lairs" ;
+task "Talk to Librarian" tag tAskForBook_1
+     need iBanana lose it
+     give iCompendium;
+
+room "Grounds (Front)" tag rUU_GroundsFront
+     dir w sw from rUU_Hall
+     exit n w;
+item "Frog" tag iFrog
+     hidden in rUU_GroundsFront
+     after tTalkToApprenticeWizard ;
+task "Talk to Apprentice Wizard" tag tTalkToApprenticeWizard
+     after ACT_1_MAINQUEST;
+task "Open University Door" tag tOpenUniversityDoor
+     after tTalkToApprenticeWizard;
+
+room "Grounds (Rear)" tag rUU_GroundsRear
+     dir se e e e e ne ;
+item "Fertiliser" tag iFertiliser
+     in rUU_GroundsRear;
+
+################################################################################
+## MAP: OVERVIEW MAPS
+map "Overview";
+
+room "Ankh-Morpork" tag rAnkhMorpork
+     note "#IMG{DW-ANKHMORPORK.png}"
+     join rUU_GroundsFront after tOpenUniversityDoor ;
+
+room "Discworld" tag rDiscworld
+     dir e from rAnkhMorpork nolink
+     note "#IMG{DW-DISCWORLD.png}";
+
+################################################################################
+## MAP: ALLEY
+map "Alley";
+
+room "Alley" tag rAlley_N
+     join rAnkhMorpork ;
+item "Magic Slab";
+
+room "Alley" tag rAlley_S
+     dir se from rAlley_N ;
+item "Hole" ;
+
+room "Alchemist" tag rAlchemist
+     dir n from rAlley_S;
+item "Box" ;
+task "Look at Box" tag tLookAtBox
+     note "Reveals Imp";
+
+room "Rooftops" tag rAlleyRooftops
+     dir n from rAlley_N
+     cmd to "Stand on magic slab"
+     cmd from "Climb in window";
+item "Ladder" tag iLadder ;
+
+
+################################################################################
+room "Livery Stable" tag rLiveryStable
+     join rAnkhMorpork;
+task "Open Sack" tag tOpenSack;
+item "Corn" tag iCorn
+     hidden after last;
