@@ -1,4 +1,3 @@
-# $Id: Makefile 3403 2007-04-05 21:24:35Z mlewissmith $
 default: help
 
 BASENAME = dw
