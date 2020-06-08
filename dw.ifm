@@ -4,26 +4,35 @@ style PATH;
 room_colour = "light gray";
 endstyle PATH;
 
+keep_unused_items = true;
+task_graph_rooms = false;
+task_graph_node = "shape=box, style=filled, color=lightgray, fontname=sans";
+
+
+task "-- ACT 1 --" tag ACT1_BEGIN;
 
 ################################################################################
 ## MAP: UNSEEN UNIVERSITY
 map "Unseen University";
 
 room "Rincewind's Room" tag rUU_RincewindRoom
-     start ;
+     start after ACT1_BEGIN;
+
 item "Pouch" tag iPouch keep
-     hidden in rUU_RincewindRoom
-     note "In the wardrobe";
+     hidden in rUU_RincewindRoom;
 item "Luggage" tag iLuggage keep
      in rUU_RincewindRoom;
-item "Banana" tag iBanana keep
+item "Banana" tag iBanana
      hidden in rUU_RincewindRoom
      need iLuggage
      note "Hidden in Luggage";
+
+task "Open Wardrobe" tag tOpenWardrobe
+     in rUU_RincewindRoom
+     get iPouch;
 task "Poke Luggage" tag tPokeLuggage
      need iBroom
-     give iLuggage
-     give iBanana;
+     give iLuggage;
 
 room "Stairs" tag rUU_StairsTop
      style PATH
@@ -37,22 +46,26 @@ room "Archchancellor's Room" tag rUU_ArchchancellorsRoom
      dir w w from rUU_StairsTop;
 task "Talk to Archchancellor" tag tArchchancellorQuest_1
      note "'...fetch me a copy of Featherwinkle's Concise Compendium of Dragon's Lairs'";
-task "Give Book to Archchancellor" tag ACT_1_MAINQUEST
+
+task "Give Book to Archchancellor" tag ACT1_BEGIN_QUEST
      need iFeatherwinkle
      note "Need: Staff, Imp, Dragon breath, Magic coil (hair curler), Metal container (frying pan).";
 
 room "Dining Room" tag rUU_DiningRoom
      dir ne from rUU_StairsBottom;
-item "Staff" tag iStaff keep
+item "Staff" tag iStaff
+     after ACT1_BEGIN_QUEST
      in rUU_DiningRoom ;
 task "Swap Broom for Staff" tag tGetStaff
-     after ACT_1_MAINQUEST
+     after ACT1_BEGIN_QUEST
      need iBroom lose it
-     note "Windle Poons's staff.  When he is reaching for food";
+     give iStaff
+     note "Windle Poons's staff,  when he is reaching for food";
 
 room "Kitchen" tag rUU_Kitchen
      dir se from rUU_StairsBottom;
 item "Frying Pan" tag iFryingPan
+     after ACT1_BEGIN_QUEST
      in rUU_Kitchen;
 
 room "Hall" tag rUU_Hall
@@ -61,7 +74,7 @@ room "Hall" tag rUU_Hall
 
 room "Closet" tag rUU_Closet
      dir nw from  rUU_Hall;
-item "Broom" tag iBroom keep
+item "Broom" tag iBroom
      in rUU_Closet;
 
 room "Library" tag rUU_Library
@@ -75,56 +88,38 @@ task "Talk to Librarian" tag tAskForBook_1
 
 room "Grounds (Front)" tag rUU_GroundsFront
      dir w sw from rUU_Hall
+     style PATH
      exit n w;
-item "Frog" tag iFrog keep
+item "Hand Wriggles" tag iHandWriggles keep
+     hidden in rUU_GroundsFront;
+item "Frog" tag iFrog
      hidden in rUU_GroundsFront
      after tTalkToApprenticeWizard ;
 task "Talk to Apprentice Wizard" tag tTalkToApprenticeWizard
-     after ACT_1_MAINQUEST;
+     after ACT1_BEGIN_QUEST
+     give iHandWriggles;
 task "Open University Door" tag tOpenUniversityDoor
-     after tTalkToApprenticeWizard;
+     need iHandWriggles;
 
 room "Grounds (Rear)" tag rUU_GroundsRear
-     dir se e e e e ne ;
-item "Fertiliser" tag iFertiliser keep
+     dir se e e e e ne from rUU_GroundsFront
+     style PATH
+     exit n;
+item "Fertiliser" tag iFertiliser
      in rUU_GroundsRear;
 
 task "Use Ladder on Window" tag tUseLadderOnWindow
      in rUU_GroundsRear
-     need iLadder;
-
-room "Kitchen Window" tag rUU_KitchenWindow
-     dir nw from rUU_GroundsRear go up
-     after tUseLadderOnWindow;
-
+     need iLadder
+     goto rUU_KitchenWindow;
 task "Use Net on Pancake" tag tUseNetOnPancake
      in rUU_KitchenWindow
+     after tUseLadderOnWindow
      need iButterflyNet
      get iFryingPan;
 
-task "Give Imp to Archchancellor" tag tGiveImpToArchchancellor
-     in rUU_ArchchancellorsRoom
-     need iImp lose it;
-task "Give Dragon Breath to Archchancellor" tag tGiveDragonBreathToArchchancellor
-     in rUU_ArchchancellorsRoom
-     need iDragonBreath lose it;
-task "Give Frying Pan to Archchancellor" tag tGiveFryingPanToArchchancellor
-     in rUU_ArchchancellorsRoom
-     need iFryingPan lose it;
-task "Give Staff to Archchancellor" tag tGiveStaffToArchchancellor
-     in rUU_ArchchancellorsRoom
-     need iStaff lose it;
-task "Give Hair Roller to Archchancellor" tag tGiveHairRollerToArchchancellor
-     in rUU_ArchchancellorsRoom
-     need iHairRoller lose it;
-
-task "Find Dragon Lair" tag tFindDragonLair
-     in rAnkhMorpork
-     after tGiveImpToArchchancellor
-     after tGiveStaffToArchchancellor
-     after tGiveDragonBreathToArchchancellor
-     after tGiveFryingPanToArchchancellor
-     after tGiveHairRollerToArchchancellor;
+room "Kitchen Window" tag rUU_KitchenWindow
+     dir nw from rUU_GroundsRear go up;
 
 ################################################################################
 ## MAP: OVERVIEW MAPS
@@ -132,7 +127,7 @@ map "Overview";
 
 room "Ankh-Morpork" tag rAnkhMorpork
      note "#IMG{DW-ANKHMORPORK.png}"
-     join rUU_GroundsFront after tOpenUniversityDoor ;
+     join rUU_GroundsFront need iHandWriggles;
 
 room "Discworld" tag rDiscworld
      dir e from rAnkhMorpork nolink
@@ -142,21 +137,23 @@ room "Discworld" tag rDiscworld
 ## MAP: ALLEY
 map "Alley";
 
-room "Alley (N)" tag rAlley_N
+room "Alley (North)" tag rAlley_N
      style PATH
-     join rAnkhMorpork ;
+     join rAnkhMorpork
+     exit nw;
 item "Magic Slab";
 
-room "Alley (S)" tag rAlley_S
+room "Alley (South)" tag rAlley_S
      style PATH
-     dir se from rAlley_N ;
+     dir se from rAlley_N;
 item "Hole";
 
 room "Rooftops" tag rAlleyRooftops
      dir n from rAlley_N go up
      cmd to "Stand on magic slab"
      cmd from "Climb in window";
-item "Ladder" tag iLadder keep;
+item "Ladder" tag iLadder keep
+     in rAlleyRooftops;
 
 room "Alchemist" tag rAlchemist
      dir n from rAlley_S;
@@ -178,13 +175,16 @@ task "Use Worm on Hole" tag tUseWormOnHole
      after tReleaseImp
      need iWorm lose it
      give iImp;
-item "Imp" tag iImp hidden in rAlley_S;
+item "Imp" tag iImp
+     after ACT1_BEGIN_QUEST
+     hidden in rAlley_S;
 
 
 room "Tower" tag rTower
      dir n from rAlleyRooftops;
 item "Flagpole" in rTower;
 item "Dragon Breath" tag iDragonBreath
+     after ACT1_BEGIN_QUEST
      hidden in rTower;
 
 task "Put Mirror on Flagpole Tip" tag tPutMirrorOnFlagpoleTip
@@ -195,19 +195,18 @@ task "Put Mirror on Flagpole Tip" tag tPutMirrorOnFlagpoleTip
 ################################################################################
 ## MAP: Livery Stable
 map "Livery Stable";
-
 room "Livery Stable" tag rLiveryStable
-     join rAnkhMorpork;
+     join rAnkhMorpork exit sw;
 task "Open Sack";
 item "Corn" tag iCorn hidden after last;
 
 ################################################################################
 map "Square";
 
-room "Square (W)" tag rSquare_W
+room "Square (West)" tag rSquare_W
      style PATH
-     join rAnkhMorpork;
-item "Bloomers" tag iBloomers keep
+     join rAnkhMorpork exit w;
+item "Bloomers" tag iBloomers
      hidden in rSquare_W;
 
 room "Psychiatrickerist" tag rPsychiatrickerist
@@ -221,13 +220,13 @@ room "Square" tag rSquare
      dir e from rSquare_W;
 item "Tomato" tag iTomato
      in rSquare;
-item "Worm" tag iWorm keep
+item "Worm" tag iWorm
      hidden in rSquare;
 
 room "DunnyKing" tag rDunnyKing
      dir n from rSquare;
 
-room "Square (E)" tag rSquare_E
+room "Square (East)" tag rSquare_E
      style PATH
      dir e from rSquare;
 item "Pickpocket" tag iPickpocket keep
@@ -255,13 +254,13 @@ task "Talk to Troll" tag tTalkToTroll
 ################################################################################
 map "Street";
 
-room "Street (W)" tag rStreet_W
-     join rAnkhMorpork
+room "Street (West)" tag rStreet_W
+     join rAnkhMorpork exit w
      style PATH;
 
 room "Toy Shop" tag rToyShop
      dir n from rStreet_W;
-item "Toy Donkey" tag iToyDonkey
+item "Donkey" tag iToyDonkey
      in rToyShop;
 item "String" tag iString keep
      in rToyShop;
@@ -273,18 +272,20 @@ room "Corner" tag rStreetCorner
 room "Fishmonger" tag rFishmonger
      style PATH
      dir e from rStreetCorner;
+
 room "Toilet" tag rStreetToilet
      dir n from rFishmonger;
 
-room "Street (E)" tag rStreet_E
+room "Street (East)" tag rStreet_E
      style PATH
      dir e from rFishmonger
+     exit e
      join rAnkhMorpork;
+
 room "Barber Shop" tag rBarber
      dir ne from rStreet_E;
-
-
 item "Hair Roller" tag iHairRoller
+     after ACT1_BEGIN_QUEST
      in rBarber;
 
 task "Look at Hair Roller" tag tLookAtHairRoller
@@ -306,18 +307,121 @@ task "Use Pickpocket on Barber" tag tUsePickpocketOnBarber
 map "Palace";
 
 room "Palace Entrance" tag rPalaceEntrance
-     join rAnkhMorpork;
-task "Act1: Talk to guards" tag tAct1TalkToGuards
+     style PATH
+     join rAnkhMorpork
+     note "Act 1: Talk to guards"
+     note "Act 2: ...";
+
+task "Talk to Guards" tag tTalkToGuards_Act1
      in rPalaceEntrance;
 
 room "Throne Room" tag rThroneRoom
      dir e from rPalaceEntrance
-     after tAct1TalkToGuards;
+     after tTalkToGuards_Act1;
 item "Custard Book" tag iCustardBook
      in rThroneRoom;
 
 room "Dressing Room" tag rDressingRoom
      dir nw from rThroneRoom;
-item "Mirror" tag iMirror keep
+item "Mirror" tag iMirror
      in rDressingRoom
      note "Put mirror in POCKET not in LUGGAGE";
+
+################################################################################
+map "Broken Drum";
+
+room "Broken Drum (Exterior)" tag rBrokenDrumExterior
+     join rAnkhMorpork exit ne
+     style PATH ;
+
+room "Broken Drum" tag rBrokenDrum
+     dir w from rBrokenDrumExterior;
+
+room "Cellar" tag rCellar
+     dir s from rBrokenDrum go d;
+
+item "Glass" tag iGlass
+     hidden in rBrokenDrum;
+item "Matches" tag iMatches
+     hidden in rBrokenDrum;
+item "Tankard" tag iTankard
+     hidden in rBrokenDrum;
+item "Beer" tag iBeer
+     hidden in rBrokenDrum;
+
+task "Look at Drinks" tag tLookAtDrinks
+     in rBrokenDrum
+     note "'Counterwise Wine'";
+task "Talk to Barman" tag tTalkToBarman_1
+     in rBrokenDrum
+     need iPouch
+     after tLookAtDrinks
+     get iGlass
+     get iMatches;
+task "Talk to Barman" tag tTalkToBarman_2
+     in rBrokenDrum
+     after tTalkToBarman_1
+     get iTankard;
+
+task "Talk to Braggart" tag tTalkToBraggart
+     in rBrokenDrum
+     get iBeer;
+
+
+################################################################################
+map "Inn";
+room "Courtyard" tag rCourtyard
+     join rAnkhMorpork exit w n
+     style PATH ;
+
+################################################################################
+map "Barn";
+room "Barn" tag rBarn
+     after tFindDragonLair
+     join rAnkhMorpork exit w;
+
+item "Treasure x4" tag iTreasure
+     hidden in rBarn;
+item "Screwdriver" tag iScrewdriver
+     in rBarn;
+
+################################################################################
+## MISSION OBJECTIVES
+
+## ACT 1
+task "Give Imp to Archchancellor" tag tGiveImpToArchchancellor
+     in rUU_ArchchancellorsRoom
+     need iImp lose it;
+task "Give Dragon Breath to Archchancellor" tag tGiveDragonBreathToArchchancellor
+     in rUU_ArchchancellorsRoom
+     need iDragonBreath lose it;
+task "Give Frying Pan to Archchancellor" tag tGiveFryingPanToArchchancellor
+     in rUU_ArchchancellorsRoom
+     need iFryingPan lose it;
+task "Give Staff to Archchancellor" tag tGiveStaffToArchchancellor
+     in rUU_ArchchancellorsRoom
+     need iStaff lose it;
+task "Give Hair Roller to Archchancellor" tag tGiveHairRollerToArchchancellor
+     in rUU_ArchchancellorsRoom
+     need iHairRoller lose it;
+
+task "Find Dragon Lair" tag tFindDragonLair
+     in rAnkhMorpork
+     after tGiveImpToArchchancellor
+     after tGiveStaffToArchchancellor
+     after tGiveDragonBreathToArchchancellor
+     after tGiveFryingPanToArchchancellor
+     after tGiveHairRollerToArchchancellor
+     goto rBarn
+     give iTreasure;
+
+task "-- END OF ACT 1 --" tag ACT1_END
+     follow tFindDragonLair;
+
+## ACT 2
+task "-- ACT 2 --" tag ACT2_BEGIN
+     follow ACT1_END
+     note "'Seek out this evil brotherhood and destroy the spells that control me.'"
+     note "'Six artifacts, used to summon me here. Bring the golden trinkets to me, and I can sever the brotherhood's control over my mind.'"
+     note "'Seek out the one who stole the book of Dragon Summoning from the Unseen University library.'"
+     goto rAnkhMorpork;

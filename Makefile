@@ -18,6 +18,7 @@ RAWITEMFILE = $(BASENAME).items.raw
 
 HTMLINDEXFILE = $(BASENAME)-index.html
 MOBIFILE = $(BASENAME)-ebook.mobi
+EPUBFILE = $(BASENAME)-ebook.epub
 
 PSDOTFILE = $(BASENAME).dot.ps
 PDFDOTFILE = $(BASENAME).dot.pdf
@@ -39,8 +40,9 @@ rawtasks: $(RAWTASKFILE)
 rawitems: $(RAWITEMFILE)
 raw: $(RAWITEMFILE) $(RAWTASKFILE) $(RAWMAPFILE)
 
-html: $(HTMLINDEXFILE) screenshots
-ebook: $(MOBIFILE)
+html: $(HTMLINDEXFILE) screenshots svgdot
+mobi: $(MOBIFILE)
+epub: $(EPUBFILE)
 
 
 pdfmap: $(PDFMAPFILE)
@@ -74,6 +76,9 @@ pngdot: $(PNGDOTFILE)
 %-ebook.mobi: %-index.html
 	@$(REPORT)
 	ebook-convert $< $@ --no-inline-toc
+%-ebook.epub: %-index.html
+	@$(REPORT)
+	ebook-convert $< $@ --level1-toc="//h:h1" --level2-toc="//h:h2" --level3-toc="//h:h3"
 
 %.map.ps: %.ifm
 	@$(REPORT)
@@ -82,6 +87,10 @@ pngdot: $(PNGDOTFILE)
 %.dot.dot: %.ifm
 	@$(REPORT)
 	ifm $(IFMOPTS) -t -f dot -o $@ $<
+	sed -i \
+		-e's:^\([[:space:]]*rankdir\)://\1:g' \
+		-e's:^\([[:space:]]*rotate\)://\1:g' \
+		$@
 %.ps: %.dot
 	@$(REPORT)
 	dot -Tps -o $@ $<
@@ -126,8 +135,8 @@ help:
 	@echo "   tasks"
 	@echo "   items"
 	@echo "   rec"
-	@echo "   (pdf)dot"
-	@echo "   (pdf)book"
+	@echo "   (pdf|svg|png)dot"
+	@echo "   (pdf|ebub|mobi)book"
 	@echo
 ## a handy macro
 REPORT=echo -e '\n\n======== Making $@ ========\n'
