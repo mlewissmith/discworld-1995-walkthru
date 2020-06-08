@@ -21,6 +21,8 @@ MOBIFILE = $(BASENAME)-ebook.mobi
 
 PSDOTFILE = $(BASENAME).dot.ps
 PDFDOTFILE = $(BASENAME).dot.pdf
+SVGDOTFILE = $(BASENAME).dot.svg
+PNGDOTFILE = $(BASENAME).dot.png
 
 IFMOPTS =
 # IFMOPTS = "-S verbose"
@@ -37,13 +39,15 @@ rawtasks: $(RAWTASKFILE)
 rawitems: $(RAWITEMFILE)
 raw: $(RAWITEMFILE) $(RAWTASKFILE) $(RAWMAPFILE)
 
-html: $(HTMLINDEXFILE)
+html: $(HTMLINDEXFILE) screenshots
 ebook: $(MOBIFILE)
 
 
 pdfmap: $(PDFMAPFILE)
 dot: $(PSDOTFILE)
 pdfdot: $(PDFDOTFILE)
+svgdot: $(SVGDOTFILE)
+pngdot: $(PNGDOTFILE)
 
 %.tasks.txt: %.ifm
 	@$(REPORT)
@@ -78,10 +82,15 @@ pdfdot: $(PDFDOTFILE)
 %.dot.dot: %.ifm
 	@$(REPORT)
 	ifm $(IFMOPTS) -t -f dot -o $@ $<
-
 %.ps: %.dot
 	@$(REPORT)
 	dot -Tps -o $@ $<
+%.svg: %.dot
+	@$(REPORT)
+	dot -Tsvg -o $@ $<
+%.png: %.dot
+	@$(REPORT)
+	dot -Tpng -o $@ $<
 
 %.pdf: %.ps
 	@$(REPORT)
