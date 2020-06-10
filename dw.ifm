@@ -12,7 +12,17 @@ task_graph_node = "shape=box, style=filled, color=lightgray, fontname=sans";
 task "-- ACT 1 --" tag ACT1_BEGIN;
 
 ################################################################################
-## MAP: UNSEEN UNIVERSITY
+map "Overview";
+
+room "Ankh-Morpork" tag rAnkhMorpork
+     note "#IMG{DW-ANKHMORPORK.png}"
+     join rUU_GroundsFront need iHandWriggles;
+
+room "Discworld" tag rDiscworld
+     dir e from rAnkhMorpork nolink
+     note "#IMG{DW-DISCWORLD.png}";
+
+################################################################################
 map "Unseen University";
 
 room "Rincewind's Room" tag rUU_RincewindRoom
@@ -107,6 +117,9 @@ room "Grounds (Rear)" tag rUU_GroundsRear
      exit n;
 item "Fertiliser" tag iFertiliser
      in rUU_GroundsRear;
+item "Garbage Can" tag iGarbageCan
+     hidden in rUU_GroundsRear
+     after ACT2_BEGIN;
 
 task "Use Ladder on Window" tag tUseLadderOnWindow
      in rUU_GroundsRear
@@ -122,19 +135,6 @@ room "Kitchen Window" tag rUU_KitchenWindow
      dir nw from rUU_GroundsRear go up;
 
 ################################################################################
-## MAP: OVERVIEW MAPS
-map "Overview";
-
-room "Ankh-Morpork" tag rAnkhMorpork
-     note "#IMG{DW-ANKHMORPORK.png}"
-     join rUU_GroundsFront need iHandWriggles;
-
-room "Discworld" tag rDiscworld
-     dir e from rAnkhMorpork nolink
-     note "#IMG{DW-DISCWORLD.png}";
-
-################################################################################
-## MAP: ALLEY
 map "Alley";
 
 room "Alley (North)" tag rAlley_N
@@ -193,8 +193,8 @@ task "Put Mirror on Flagpole Tip" tag tPutMirrorOnFlagpoleTip
      give iDragonBreath;
 
 ################################################################################
-## MAP: Livery Stable
 map "Livery Stable";
+
 room "Livery Stable" tag rLiveryStable
      join rAnkhMorpork exit sw;
 task "Open Sack";
@@ -370,16 +370,17 @@ task "Talk to Braggart" tag tTalkToBraggart
 
 ################################################################################
 map "Inn";
+
 room "Courtyard" tag rCourtyard
      join rAnkhMorpork exit w n
      style PATH ;
 
 ################################################################################
 map "Barn";
+
 room "Barn" tag rBarn
      after tFindDragonLair
      join rAnkhMorpork exit w;
-
 item "Treasure x4" tag iTreasure
      hidden in rBarn;
 item "Screwdriver" tag iScrewdriver
