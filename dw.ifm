@@ -288,8 +288,10 @@ room "Fishmonger" tag rFishmonger
      style PATH
      dir e from rStreetCorner;
 
-room "Toilet" tag rStreetToilet
+room "Street Alley" tag rStreetAlley
      dir n from rFishmonger;
+item "Robe" tag iRobe
+     hidden in rStreetAlley;
 
 room "Street (East)" tag rStreet_E
      style PATH
@@ -405,10 +407,10 @@ item "Screwdriver" tag iScrewdriver
 map "Unseen University (Night)";
 
 room "Library (Night)" tag rLibrary_Night
+     exit w n
      join rUU_Library after LSPACE;
 task "Wait for Thief" tag tWaitForThief
-     in rLibrary_Night
-     after LSPACE;
+     in rLibrary_Night;
 task "Get Book" tag LSPACE_HOLE
      in rLibrary_Night
      follow tWaitForThief
@@ -419,21 +421,72 @@ task "Follow Thief" tag tFollowThief
 #task "Return through L-space" in rUU_Library follow tFollowThief;
 
 ################################################################################
-map "Hide-out";
+map "Hide-out (Night)";
 
-room "Hide-out" tag rHideout
+room "Hide-out (Night)" tag rHideout_Night
+     exit e
      join rAnkhMorpork_Night after tFollowThief;
-task "Turn Drainpipe" tag tTurnDrainpipe
-     in rHideout;
-task "Use Glass on Drainpipe" tag tUseGlassOnDrainpipe
-     in rHideout
-     need iGlass;
-task "Wait for Thief" tag tWaitForThief_hideout in rHideout
+task "Turn Drainpipe" tag tTurnDrainpipe in rHideout_Night;
+task "Wait for Thief" tag tWaitForThief_hideout in rHideout_Night
      after tFollowThief;
-task "Listen to Password" tag tListenToPassword in rHideout
+task "Use Glass on Drainpipe" tag tUseGlassOnDrainpipe in rHideout_Night
+     after tWaitForThief_hideout
+     need iGlass;
+task "Listen to Password" tag tListenToPassword in rHideout_Night
      after tUseGlassOnDrainpipe
      after tTurnDrainpipe
      after tWaitForThief_hideout;
+task "Wear Robe" tag tWearRobe in rHideout_Night
+     need iRobe
+     after tListenToPassword;
+
+################################################################################
+map "Park (Night)";
+
+room "Park (Night)" tag rPark_Night
+     exit w e
+     join rAnkhMorpork_Night;
+item "Butterfly" tag iButterfly
+     in rPark_Night;
+task "Use Frog on Drunk" tag tUseFrogOnDrunk
+     in rPark_Night
+     need iFrog lose it;
+task "Use Net on Butterfly" tag tUseNetOnButterfly
+     in rPark_Night
+     need iButterflyNet
+     give iButterfly;
+
+################################################################################
+map "Street (Night)";
+
+room "Street (West)" tag rStreet_W_Night
+     join rAnkhMorpork_Night exit w
+     style PATH;
+
+
+room "Corner (Night)" tag rStreetCorner_Night
+     style PATH
+     dir se from rStreet_W_Night;
+item "Pot" tag iPot
+     in rStreetCorner_Night;
+task "Use Butterfly on Lamp" tag tUseButterflyOnLamp
+     in rStreetCorner_Night
+     need iButterfly lose it
+     get iRobe;
+
+room "Fishmonger (Night)" tag rFishmonger_Night
+     style PATH
+     dir e from rStreetCorner_Night;
+
+room "Street Alley (Night)" tag rStreetAlley_Night
+     dir n from rFishmonger_Night;
+
+room "Street (East)" tag rStreet_E_Night
+     style PATH
+     dir e from rFishmonger_Night
+     exit e
+     join rAnkhMorpork_Night;
+
 
 ################################################################################
 ## MISSION OBJECTIVES
