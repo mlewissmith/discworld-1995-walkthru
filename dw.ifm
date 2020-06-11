@@ -18,8 +18,12 @@ room "Ankh-Morpork" tag rAnkhMorpork
      note "#IMG{DW-ANKHMORPORK.png}"
      join rUU_GroundsFront need iHandWriggles;
 
-room "Discworld" tag rDiscworld
+room "Ankh-Morpork (Night)" tag rAnkhMorpork_Night
      dir e from rAnkhMorpork nolink
+     join rLibrary_Night after LSPACE_HOLE;
+
+room "Discworld" tag rDiscworld
+     dir e from rAnkhMorpork_Night nolink
      note "#IMG{DW-DISCWORLD.png}";
 
 ################################################################################
@@ -95,6 +99,17 @@ item "Book (Featherwinkle)" tag iFeatherwinkle keep
 task "Talk to Librarian" tag tAskForBook_1
      need iBanana lose it
      give iFeatherwinkle;
+item "Gold Banana" tag iGoldBanana
+     hidden in rUU_Library
+     note "Behind Sleazy Guy's ear";
+
+task "Give Treasure to Sleazy Guy" tag tGiveTreasureToSleazyGuy
+     in rUU_Library
+     need iTreasure lose it
+     give iGoldBanana;
+task "Give Gold Banana to Librarian" tag tGiveGoldBananaToLibrarian tag LSPACE
+     in rUU_Library
+     need iGoldBanana lose it;
 
 room "Grounds (Front)" tag rUU_GroundsFront
      dir w sw from rUU_Hall
@@ -165,8 +180,8 @@ task "Put Corn in Flask" tag tPutCornInFlask
 task "Release Imp" tag tReleaseImp
      after tPutCornInFlask
      note "The imp escapes...";
-
 task "Use Worm on String" tag tUseWormOnString
+     in any
      need iWorm
      need iString;
 task "Use Worm on Hole" tag tUseWormOnHole
@@ -340,13 +355,13 @@ room "Broken Drum" tag rBrokenDrum
 room "Cellar" tag rCellar
      dir s from rBrokenDrum go d;
 
-item "Glass" tag iGlass
+item "Glass" tag iGlass keep
      hidden in rBrokenDrum;
-item "Matches" tag iMatches
+item "Matches" tag iMatches keep
      hidden in rBrokenDrum;
-item "Tankard" tag iTankard
+item "Tankard" tag iTankard keep
      hidden in rBrokenDrum;
-item "Beer" tag iBeer
+item "Beer" tag iBeer keep
      hidden in rBrokenDrum;
 
 task "Look at Drinks" tag tLookAtDrinks
@@ -387,6 +402,40 @@ item "Screwdriver" tag iScrewdriver
      in rBarn;
 
 ################################################################################
+map "Unseen University (Night)";
+
+room "Library (Night)" tag rLibrary_Night
+     join rUU_Library after LSPACE;
+task "Wait for Thief" tag tWaitForThief
+     in rLibrary_Night
+     after LSPACE;
+task "Get Book" tag LSPACE_HOLE
+     in rLibrary_Night
+     follow tWaitForThief
+     note "Opens Book Shelf";
+task "Follow Thief" tag tFollowThief
+     follow LSPACE_HOLE in rAnkhMorpork_Night
+     note "Reveals Hide-out";
+#task "Return through L-space" in rUU_Library follow tFollowThief;
+
+################################################################################
+map "Hide-out";
+
+room "Hide-out" tag rHideout
+     join rAnkhMorpork_Night after tFollowThief;
+task "Turn Drainpipe" tag tTurnDrainpipe
+     in rHideout;
+task "Use Glass on Drainpipe" tag tUseGlassOnDrainpipe
+     in rHideout
+     need iGlass;
+task "Wait for Thief" tag tWaitForThief_hideout in rHideout
+     after tFollowThief;
+task "Listen to Password" tag tListenToPassword in rHideout
+     after tUseGlassOnDrainpipe
+     after tTurnDrainpipe
+     after tWaitForThief_hideout;
+
+################################################################################
 ## MISSION OBJECTIVES
 
 ## ACT 1
@@ -406,23 +455,24 @@ task "Give Hair Roller to Archchancellor" tag tGiveHairRollerToArchchancellor
      in rUU_ArchchancellorsRoom
      need iHairRoller lose it;
 
-task "Find Dragon Lair" tag tFindDragonLair
+task "Find Dragon Lair" tag tFindDragonLair tag ACT1_END
      in rAnkhMorpork
      after tGiveImpToArchchancellor
      after tGiveStaffToArchchancellor
      after tGiveDragonBreathToArchchancellor
      after tGiveFryingPanToArchchancellor
      after tGiveHairRollerToArchchancellor
-     goto rBarn
-     give iTreasure;
+     goto rBarn;
 
-task "-- END OF ACT 1 --" tag ACT1_END
-     follow tFindDragonLair;
+# task "-- END OF ACT 1 --" tag ACT1_END
+#      follow tFindDragonLair;
 
 ## ACT 2
 task "-- ACT 2 --" tag ACT2_BEGIN
-     follow ACT1_END
+     follow ACT1_END in any
+     give iTreasure
      note "'Seek out this evil brotherhood and destroy the spells that control me.'"
      note "'Six artifacts, used to summon me here. Bring the golden trinkets to me, and I can sever the brotherhood's control over my mind.'"
      note "'Seek out the one who stole the book of Dragon Summoning from the Unseen University library.'"
      goto rAnkhMorpork;
+
