@@ -1,4 +1,4 @@
-screenshots: DW-ANKHMORPORK.png DW-DISCWORLD.png
+screenshots: DW-ANKHMORPORK.png DW-DISCWORLD.png DW-LSPACE.png
 
 %.png: %.bmp
 	convert $< $@
