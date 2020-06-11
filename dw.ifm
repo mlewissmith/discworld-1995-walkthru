@@ -15,13 +15,11 @@ task "-- ACT 1 --" tag ACT1_BEGIN;
 map "Overview";
 
 room "Ankh-Morpork" tag rAnkhMorpork
-     note "#IMG{DW-ANKHMORPORK.png}"
-     join rUU_GroundsFront need iHandWriggles;
+     note "#IMG{DW-ANKHMORPORK.png}";
 
 room "Ankh-Morpork (Night)" tag rAnkhMorpork_Night
-     note "#IMG{DW-LSPACE.png}"
      dir e from rAnkhMorpork nolink
-     join rLibrary_Night after LSPACE_HOLE;
+     note "#IMG{DW-LSPACE.png}";
 
 room "Discworld" tag rDiscworld
      dir e from rAnkhMorpork_Night nolink
@@ -116,16 +114,13 @@ room "Grounds (Front)" tag rUU_GroundsFront
      dir w sw from rUU_Hall
      style PATH
      exit n w;
-item "Hand Wriggles" tag iHandWriggles keep
-     hidden in rUU_GroundsFront;
+task "Talk to Apprentice Wizard" tag tTalkToApprenticeWizard
+     after ACT1_BEGIN_QUEST;
 item "Frog" tag iFrog
      hidden in rUU_GroundsFront
-     after tTalkToApprenticeWizard ;
-task "Talk to Apprentice Wizard" tag tTalkToApprenticeWizard
-     after ACT1_BEGIN_QUEST
-     give iHandWriggles;
-task "Open University Door" tag tOpenUniversityDoor
-     need iHandWriggles;
+     after tTalkToApprenticeWizard;
+task "Open University Door" tag tOpenUniversityDoor in rUU_GroundsFront
+     after tTalkToApprenticeWizard;
 
 room "Grounds (Rear)" tag rUU_GroundsRear
      dir se e e e e ne from rUU_GroundsFront
@@ -230,6 +225,12 @@ room "Psychiatrickerist" tag rPsychiatrickerist
 item "Butterfly Net" tag iButterflyNet keep
      in rPsychiatrickerist
      note "Put it in POCKET not LUGGAGE";
+item "Ink Blot x2" tag iInkBlot
+     hidden in rPsychiatrickerist;
+task "'Shut up and sit down'" tag tVisitPsychaitrickerist
+     after INFILTRATE_CULT
+     give iInkBlot
+     note "wait... talk to the troll... wait...";
 
 room "Square" tag rSquare
      style PATH
@@ -238,9 +239,16 @@ item "Tomato" tag iTomato
      in rSquare;
 item "Worm" tag iWorm
      hidden in rSquare;
+item "Donut" tag iDonut
+     hidden in rSquare;
+task "Talk to Dibbler" tag tTalkToDibbler
+     in rSquare after INFILTRATE_CULT
+     give iDonut;
 
 room "DunnyKing" tag rDunnyKing
      dir n from rSquare;
+task "Give Donut to Dunnyman" tag tGiveDonutToDunnyman
+     need iDonut lose it;
 
 room "Square (East)" tag rSquare_E
      style PATH
@@ -261,6 +269,11 @@ task "Talk to Street Starfish" tag tTalkToStreetStarfish
      in rSquare_E
      give iPickpocket
      give iBloomers;
+
+task "Talk to Street Starfish" tag tTalkToStreetStarfish_ACT2
+     in rSquare_E
+     after INFILTRATE_CULT
+     note "'Prove you're a man...'";
 
 task "Talk to Troll" tag tTalkToTroll
      in rPsychiatrickerist
@@ -291,7 +304,7 @@ room "Fishmonger" tag rFishmonger
 
 room "Street Alley" tag rStreetAlley
      dir n from rFishmonger;
-item "Robe" tag iRobe
+item "Robe" tag iRobe keep
      hidden in rStreetAlley;
 
 room "Street (East)" tag rStreet_E
@@ -328,16 +341,24 @@ room "Palace Entrance" tag rPalaceEntrance
      style PATH
      join rAnkhMorpork
      note "Act 1: Talk to guards"
-     note "Act 2: ...";
+     note "Act 2: Show Inkblots";
 
-task "Talk to Guards" tag tTalkToGuards_Act1
+task "Talk to Guards" tag tTalkToGuards_ACT1
      in rPalaceEntrance;
+task "Give Ink Blot to Guard" tag tGiveInkBlotToGuard
+     need iInkBlot lose it
+     after INFILTRATE_CULT;
+
 
 room "Throne Room" tag rThroneRoom
      dir e from rPalaceEntrance
-     after tTalkToGuards_Act1;
+     after tTalkToGuards_ACT1;
 item "Custard Book" tag iCustardBook
      in rThroneRoom;
+
+task "Talk to Peasant" tag tTalkToPeasant
+     after tGiveInkBlotToGuard
+     note "Thief has gone to the Shades";
 
 room "Dressing Room" tag rDressingRoom
      dir nw from rThroneRoom;
@@ -405,21 +426,36 @@ item "Screwdriver" tag iScrewdriver
      in rBarn;
 
 ################################################################################
+map "Shades";
+
+room "Shades (W)" tag rShades_W style PATH
+     exit s
+     join rAnkhMorpork after tTalkToPeasant;
+
+room "Shades" tag rShades style PATH
+     dir ne from rShades_W;
+item "Mural" tag iMural;
+
+room "Shades (E)" tag rShades_E style PATH
+     dir se from rShades;
+
+room "Hovel" tag rHovel
+     dir e from rShades_E nolink;
+
+room "Cathouse" tag rCathouse
+     dir n from rShades_E;
+
+################################################################################
 map "Unseen University (Night)";
 
 room "Library (Night)" tag rLibrary_Night
-     exit w n
-     join rUU_Library after LSPACE;
+     exit w n;
 task "Wait for Thief" tag tWaitForThief
      in rLibrary_Night;
-task "Get Book" tag LSPACE_HOLE
+task "Get Book (open bookshelf)" tag LSPACE_HOLE
      in rLibrary_Night
      follow tWaitForThief
      note "Opens Book Shelf";
-task "Follow Thief" tag tFollowThief
-     follow LSPACE_HOLE in rAnkhMorpork_Night
-     note "Reveals Hide-out";
-#task "Return through L-space" in rUU_Library follow tFollowThief;
 
 ################################################################################
 map "Hide-out (Night)";
@@ -428,15 +464,15 @@ room "Hide-out (Night)" tag rHideout_Night
      exit e
      join rAnkhMorpork_Night after tFollowThief;
 task "Turn Drainpipe" tag tTurnDrainpipe in rHideout_Night;
-task "Wait for Thief" tag tWaitForThief_hideout in rHideout_Night
+task "Wait for Thief at Hideout" tag tWaitForThiefAtHideout in rHideout_Night
      after tFollowThief;
 task "Use Glass on Drainpipe" tag tUseGlassOnDrainpipe in rHideout_Night
-     after tWaitForThief_hideout
+     after tWaitForThiefAtHideout
      need iGlass;
 task "Listen to Password" tag tListenToPassword in rHideout_Night
      after tUseGlassOnDrainpipe
      after tTurnDrainpipe
-     after tWaitForThief_hideout;
+     after tWaitForThiefAtHideout;
 task "Wear Robe" tag tWearRobe in rHideout_Night
      need iRobe
      after tListenToPassword;
@@ -464,7 +500,6 @@ room "Street (West)" tag rStreet_W_Night
      join rAnkhMorpork_Night exit w
      style PATH;
 
-
 room "Corner (Night)" tag rStreetCorner_Night
      style PATH
      dir se from rStreet_W_Night;
@@ -482,17 +517,50 @@ room "Fishmonger (Night)" tag rFishmonger_Night
 room "Street Alley (Night)" tag rStreetAlley_Night
      dir n from rFishmonger_Night;
 
+task "Read Graffiti" tag tReadGraffiti
+     in rStreetAlley_Night
+     cmd "Open Door"
+     cmd "Read Graffiti";
+
 room "Street (East)" tag rStreet_E_Night
      style PATH
      dir e from rFishmonger_Night
      exit e
      join rAnkhMorpork_Night;
 
+################################################################################
+map "Shades (Night)";
+
+room "Shades (W)" tag rShades_W_Night style PATH
+     exit s
+     join rAnkhMorpork_Night after tTalkToPeasant;
+
+room "Shades" tag rShades_Night style PATH
+     dir ne from rShades_W_Night;
+
+room "Shades (E)" tag rShades_E_Night style PATH
+     dir se from rShades_Night;
+
+room "Hovel" tag rHovel_Night
+     dir e from rShades_E_Night need iLadder;
+
+room "Cathouse" tag rCathouse_Night
+     dir n from rShades_E_Night;
+
+task "Talk to Big Sally" tag tTalkToBigSally
+     in rCathouse_Night
+     after tReadGraffiti
+     note "Milk, egg, flour";
 
 ################################################################################
 ## MISSION OBJECTIVES
 
 ## ACT 1
+task "GO TO ANKH MORPORK" tag GOTO_ANKHMORPORK in any
+     after tOpenUniversityDoor
+     goto rAnkhMorpork;
+join rAnkhMorpork to rUU_GroundsFront after GOTO_ANKHMORPORK;
+
 task "Give Imp to Archchancellor" tag tGiveImpToArchchancellor
      in rUU_ArchchancellorsRoom
      need iImp lose it;
@@ -518,15 +586,34 @@ task "Find Dragon Lair" tag tFindDragonLair tag ACT1_END
      after tGiveHairRollerToArchchancellor
      goto rBarn;
 
-# task "-- END OF ACT 1 --" tag ACT1_END
-#      follow tFindDragonLair;
-
 ## ACT 2
-task "-- ACT 2 --" tag ACT2_BEGIN
-     follow ACT1_END in any
+task "-- ACT 2 --" tag ACT2_BEGIN in any
+     follow ACT1_END
      give iTreasure
      note "'Seek out this evil brotherhood and destroy the spells that control me.'"
      note "'Six artifacts, used to summon me here. Bring the golden trinkets to me, and I can sever the brotherhood's control over my mind.'"
      note "'Seek out the one who stole the book of Dragon Summoning from the Unseen University library.'"
      goto rAnkhMorpork;
 
+task "GO TO LSPACE" tag GOTO_LSPACE in rUU_Library
+     after tGiveGoldBananaToLibrarian
+     goto rLibrary_Night ;
+join rLibrary_Night to rUU_Library after GOTO_LSPACE;
+
+#task tWaitForThief after GOTO_LSPACE;
+
+task "GO TO ANKH-MORPORK NIGHT" tag GOTO_ANKHMORPORK_NIGHT in any
+     after GOTO_LSPACE
+     after LSPACE_HOLE
+     goto rAnkhMorpork_Night;
+join rLibrary_Night to rAnkhMorpork_Night after GOTO_ANKHMORPORK_NIGHT;
+
+task "Follow Thief" tag tFollowThief in rAnkhMorpork_Night
+     after LSPACE_HOLE
+     note "Reveals Hide-out"
+     goto rHideout_Night;
+
+task "INFILTRATE CULT" tag INFILTRATE_CULT in any
+     follow tWearRobe
+     after ACT2_BEGIN
+     note "Cultists are: Fool, Dunnyman, Fishmonger, Sweep, Thief, Mason";
