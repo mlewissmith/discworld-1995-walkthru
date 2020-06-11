@@ -108,7 +108,7 @@ pngdot: $(PNGDOTFILE)
 
 
 .PHONY: screenshots
-SCREENSHOTS=DW-ANKHMORPORK.png DW-DISCWORLD.png
+SCREENSHOTS=DW-ANKHMORPORK.png DW-DISCWORLD.png DW-LSPACE.png
 $(SCREENSHOTS):
 	$(MAKE) -C screenshots $@
 	cp screenshots/$@ $@

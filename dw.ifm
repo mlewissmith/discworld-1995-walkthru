@@ -19,6 +19,7 @@ room "Ankh-Morpork" tag rAnkhMorpork
      join rUU_GroundsFront need iHandWriggles;
 
 room "Ankh-Morpork (Night)" tag rAnkhMorpork_Night
+     note "#IMG{DW-LSPACE.png}"
      dir e from rAnkhMorpork nolink
      join rLibrary_Night after LSPACE_HOLE;
 
