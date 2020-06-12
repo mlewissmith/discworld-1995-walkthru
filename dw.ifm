@@ -74,6 +74,10 @@ task "Swap Broom for Staff" tag tGetStaff
      need iBroom lose it
      give iStaff
      note "Windle Poons's staff,  when he is reaching for food";
+task "Use Drumstick on Gong" tag tUseDrumstickOnGong
+     in rUU_DiningRoom
+     need iDrumstick
+     get iPrunes;
 
 room "Kitchen" tag rUU_Kitchen
      dir se from rUU_StairsBottom;
@@ -121,6 +125,8 @@ item "Frog" tag iFrog
      after tTalkToApprenticeWizard;
 task "Open University Door" tag tOpenUniversityDoor in rUU_GroundsFront
      after tTalkToApprenticeWizard;
+item "Prunes" tag iPrunes keep
+     in rUU_GroundsFront;
 
 room "Grounds (Rear)" tag rUU_GroundsRear
      dir se e e e e ne from rUU_GroundsFront
@@ -293,6 +299,8 @@ item "Donkey" tag iToyDonkey
      in rToyShop;
 item "String" tag iString keep
      in rToyShop;
+item "Doll" tag iDoll
+     hidden in rToyShop after ACT2_BEGIN;
 
 room "Corner" tag rStreetCorner
      style PATH
@@ -301,6 +309,10 @@ room "Corner" tag rStreetCorner
 room "Fishmonger" tag rFishmonger
      style PATH
      dir e from rStreetCorner;
+task "Use Prunes on Caviar" tag tUsePrunesOnCaviar
+     in rFishmonger after ACT2_BEGIN
+     need iPrunes;
+##  octopus... act2 after INFLITRATE
 
 room "Street Alley" tag rStreetAlley
      dir n from rFishmonger;
@@ -410,9 +422,35 @@ task "Talk to Braggart" tag tTalkToBraggart
 ################################################################################
 map "Inn";
 
-room "Courtyard" tag rCourtyard
+room "Courtyard" tag rInnCourtyard
      join rAnkhMorpork exit w n
      style PATH ;
+
+room "Room" tag rInnRoom
+     dir n from rInnCourtyard
+     after ACT2_BEGIN;
+item "Sheet" tag iSheet in rInnRoom keep;
+
+room "Bathroom" tag rInnBathroom dir e from rInnRoom;
+item "Bubble Bath" tag iBubbleBath in rInnBathroom keep;
+
+
+################################################################################
+map "City Gate";
+
+room "City Gate" tag rCityGate
+     join rAnkhMorpork exit e w;
+
+item "Keg" tag iKeg
+     hidden in rCityGate
+     after tOpenCrate;
+item "Fireworks" tag iFireworks
+     hidden in rCityGate
+     after tOpenCrate;
+task "Open Crate" tag tOpenCrate
+     after ACT2_BEGIN
+     give iKeg
+     give iFireworks;
 
 ################################################################################
 map "Barn";
@@ -551,6 +589,29 @@ task "Talk to Big Sally" tag tTalkToBigSally
      in rCathouse_Night
      after tReadGraffiti
      note "Milk, egg, flour";
+
+################################################################################
+map "Drum (Night)";
+
+room "Drum (Exterior) (Night)" tag rDrumExterior_Night
+     join rAnkhMorpork_Night exit ne
+     style PATH ;
+
+item "Drumstick" tag iDrumstick keep
+     hidden in rDrumExterior_Night;
+
+task "Use Ladder on Shingle" tag tUseLadderOnShingle
+     in rDrumExterior_Night
+     after tStartBarFight
+     give iDrumstick;
+
+room "Drum (Night)" tag rDrum_Night
+     dir w from rDrumExterior_Night;
+
+task "Start Bar Fight" tag tStartBarFight
+     in rDrum_Night
+     cmd "Look at Picture"
+     cmd "Turn Glass upside-down";
 
 ################################################################################
 ## MISSION OBJECTIVES
