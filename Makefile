@@ -88,9 +88,11 @@ pngdot: $(PNGDOTFILE)
 	@$(REPORT)
 	ifm $(IFMOPTS) -t -f dot -o $@ $<
 	sed -i \
+		-e's:^\([[:space:]]*graph\)://\1:g' \
 		-e's:^\([[:space:]]*rankdir\)://\1:g' \
 		-e's:^\([[:space:]]*rotate\)://\1:g' \
 		$@
+
 %.ps: %.dot
 	@$(REPORT)
 	dot -Tps -o $@ $<
