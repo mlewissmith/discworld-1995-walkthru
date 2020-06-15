@@ -89,14 +89,24 @@ item "Frying Pan" tag iFryingPan
      after ACT1_BEGIN_QUEST
      in rUU_Kitchen;
 
+item "Corn flour" tag iCornFlour
+     in rUU_Kitchen after ACT2_BEGIN;
+
 room "Hall" tag rUU_Hall
      style PATH
      dir w w from rUU_StairsBottom;
 
 room "Closet" tag rUU_Closet
      dir nw from  rUU_Hall;
+
 item "Broom" tag iBroom
      in rUU_Closet;
+item "Starch" tag iStarch hidden in rUU_Closet;
+task "Use Matches on Shape" tag tUseMatchesOnShape
+     in rUU_Closet
+     need iMatches
+     note "Lights the lamp.  Reveals 'Packet'."
+     get iStarch;
 
 room "Library" tag rUU_Library
      dir ne from rUU_Hall;
@@ -170,12 +180,35 @@ room "Alley (South)" tag rAlley_S
      dir se from rAlley_N;
 item "Hole";
 
+task "Use Worm on Hole" tag tUseWormOnHole
+     in rAlley_S
+     after tUseWormOnString
+     after tReleaseImp
+     need iWorm lose it
+     give iImp;
+item "Imp" tag iImp
+     after ACT1_BEGIN_QUEST
+     hidden in rAlley_S;
+
+task "Use Matches on Fuse" tag tUseMatchesOnFuse
+     in rAlley_S
+     need iMatches
+     after tUseStringOnKeg
+     give iBrush;
+
 room "Rooftops" tag rAlleyRooftops
      dir n from rAlley_N go up
      cmd to "Stand on magic slab"
      cmd from "Climb in window";
 item "Ladder" tag iLadder keep
      in rAlleyRooftops;
+item "Brush" tag iBrush
+     hidden in rAlleyRooftops;
+
+task "Put Doll in Chimney" tag tPutDollInChimney
+     in rAlleyRooftops
+     need iDoll lose it
+     after INFILTRATE_CULT;
 
 room "Alchemist" tag rAlchemist
      dir n from rAlley_S;
@@ -192,16 +225,15 @@ task "Use Worm on String" tag tUseWormOnString
      in any
      need iWorm
      need iString;
-task "Use Worm on Hole" tag tUseWormOnHole
-     in rAlley_S
-     after tUseWormOnString
-     after tReleaseImp
-     need iWorm lose it
-     give iImp;
-item "Imp" tag iImp
-     after ACT1_BEGIN_QUEST
-     hidden in rAlley_S;
 
+task "Put Keg in Fireplace" tag tPutKegInFireplace
+     in rAlchemist
+     after tPutDollInChimney
+     need iKeg lose it;
+task "Use String on Keg in fireplace" tag tUseStringOnKeg
+     in rAlchemist
+     after tPutKegInFireplace
+     need iString;
 
 room "Tower" tag rTower
      dir n from rAlleyRooftops;
@@ -236,13 +268,25 @@ room "Psychiatrickerist" tag rPsychiatrickerist
      dir n from rSquare_W;
 item "Butterfly Net" tag iButterflyNet keep
      in rPsychiatrickerist
-     note "Put it in POCKET not LUGGAGE";
+     note "Put net in POCKET not LUGGAGE";
+task "Talk to Troll" tag tTalkToTroll
+     in rPsychiatrickerist
+     get iButterflyNet
+     note "Leave the room then come back";
+
 item "Ink Blot x2" tag iInkBlot
      hidden in rPsychiatrickerist;
 task "'Shut up and sit down'" tag tVisitPsychaitrickerist
      after INFILTRATE_CULT
      give iInkBlot
      note "wait... talk to the troll... wait...";
+
+item "Note" tag iNote
+     hidden in rPsychiatrickerist;
+task "Talk to Milkmaid" tag tTalkToMilkmaid_ACT2
+     in rPsychiatrickerist
+     after tTalkToBarber_ACT2
+     give iNote;
 
 room "Square" tag rSquare
      style PATH
@@ -260,7 +304,8 @@ task "Talk to Dibbler" tag tTalkToDibbler
 room "DunnyKing" tag rDunnyKing
      dir n from rSquare;
 task "Give Donut to Dunnyman" tag tGiveDonutToDunnyman
-     need iDonut lose it;
+     need iDonut lose it
+     note "Dunnyman runs to Barber's";
 
 room "Square (East)" tag rSquare_E
      style PATH
@@ -287,10 +332,6 @@ task "Talk to Street Starfish" tag tTalkToStreetStarfish_ACT2
      after INFILTRATE_CULT
      note "'Prove you're a man...'";
 
-task "Talk to Troll" tag tTalkToTroll
-     in rPsychiatrickerist
-     get iButterflyNet
-     note "Leave the room then come back";
 
 ################################################################################
 map "Street";
@@ -306,7 +347,8 @@ item "Donkey" tag iToyDonkey
 item "String" tag iString keep
      in rToyShop;
 item "Doll" tag iDoll
-     hidden in rToyShop after ACT2_BEGIN;
+     hidden in rToyShop after ACT2_BEGIN
+     note "Put Doll in POCKET not LUGGAGE";
 
 room "Corner" tag rStreetCorner
      style PATH
@@ -352,6 +394,22 @@ task "Use Pickpocket on Barber" tag tUsePickpocketOnBarber
      after tTalkToBarber
      give iHairRoller;
 
+item "Tooth" tag iTooth
+     hidden in rBarber
+     note "A Gold Tooth";
+task "Talk to Barber" tag tTalkToBarber_ACT2
+     in rBarber
+     after tGiveDonutToDunnyman
+     after tVisitPsychaitrickerist
+     note "Arrange to meet Milkmaid...";
+task "Give Note to Barber" tag tGiveNoteToBarber
+     in rBarber
+     need iNote lose it;
+task "Use Apparatus" tag tUseApparatus
+     in rBarber
+     after tGiveNoteToBarber
+     give iTooth;
+
 ################################################################################
 map "Palace";
 
@@ -362,7 +420,8 @@ room "Palace Entrance" tag rPalaceEntrance
      note "Act 2: Show Inkblots";
 
 task "Talk to Guards" tag tTalkToGuards_ACT1
-     in rPalaceEntrance;
+     in rPalaceEntrance
+     after GOTO_ANKHMORPORK;
 task "Give Ink Blot to Guard" tag tGiveInkBlotToGuard
      need iInkBlot lose it
      after INFILTRATE_CULT;
@@ -458,9 +517,14 @@ item "Fireworks" tag iFireworks
      hidden in rCityGate
      after tOpenCrate;
 task "Open Crate" tag tOpenCrate
+     in rCityGate
      after ACT2_BEGIN
      give iKeg
      give iFireworks;
+
+task "Give City Pass to Guard" tag tGiveGatePassToGuard
+     in rCityGate
+     need iCityPass lose it;
 
 ################################################################################
 map "Barn";
@@ -470,7 +534,7 @@ room "Barn" tag rBarn
      join rAnkhMorpork exit w;
 item "Treasure x4" tag iTreasure
      hidden in rBarn;
-item "Screwdriver" tag iScrewdriver
+item "Screwdriver" tag iScrewdriver keep
      in rBarn;
 
 ################################################################################
@@ -650,6 +714,31 @@ task "Get Jewellery Box" tag tGetJewelleryBox2
      give iCityPass;
 
 ################################################################################
+map "Edge of World";
+
+room "Edge of World" tag rEdgeOfWorld
+     exit e
+     join rDiscworld;
+item "Lamp" tag iLamp in rEdgeOfWorld;
+item "Coconut" tag iCoconut in rEdgeOfWorld keep;
+task "Shake Coconut Tree" tag tShakeCoconutTree in rEdgeOfWorld;
+task "Get Coconut with Net" tag tGetCoconutWithNet in rEdgeOfWorld
+     after tShakeCoconutTree
+     need iButterflyNet
+     give iCoconut;
+
+################################################################################
+map "Pass";
+
+room "Pass" tag rPass
+     exit e
+     join rDiscworld
+     note "The pass is hidden in the mountains.";
+item "Egg" tag iEgg in rPass;
+item "Feather" tag iFeather in rPass;
+
+
+################################################################################
 ## MISSION OBJECTIVES
 
 ## ACT 1
@@ -721,3 +810,18 @@ task "INFILTRATE CULT" tag INFILTRATE_CULT in any
      follow tWearRobe
      after ACT2_BEGIN
      note "Cultists are: Fool, Dunnyman, Fishmonger, Sweep, Thief, Mason";
+
+task "Go to Discworld" tag GOTO_DISCWORLD in any
+     follow tGiveGatePassToGuard
+     goto rDiscworld;
+join rDiscworld to rCityGate after GOTO_DISCWORLD;
+
+task "Use Screwdriver on Coconut" tag tUseScrewdriverOnCoconut in any
+     need iScrewdriver
+     need iCoconut
+     note "'Ah, now I can get at the milk.'";
+
+task "Give Coconut to Big Sally" tag tGiveCoconutToBigSally
+     in rCathouse_Night
+     after tTalkToBigSally
+     need iCoconut lose it;
