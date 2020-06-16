@@ -89,7 +89,7 @@ item "Frying Pan" tag iFryingPan
      after ACT1_BEGIN_QUEST
      in rUU_Kitchen;
 
-item "Corn flour" tag iCornFlour
+item "Cornflour" tag iCornflour
      in rUU_Kitchen after ACT2_BEGIN;
 
 room "Hall" tag rUU_Hall
@@ -203,7 +203,8 @@ room "Rooftops" tag rAlleyRooftops
 item "Ladder" tag iLadder keep
      in rAlleyRooftops;
 item "Brush" tag iBrush
-     hidden in rAlleyRooftops;
+     hidden in rAlleyRooftops
+     note "Sweep's golden item.";
 
 task "Put Doll in Chimney" tag tPutDollInChimney
      in rAlleyRooftops
@@ -261,7 +262,7 @@ map "Square";
 room "Square (West)" tag rSquare_W
      style PATH
      join rAnkhMorpork exit w;
-item "Bloomers" tag iBloomers
+item "Bloomers (Pink)" tag iBloomers_Pink
      hidden in rSquare_W;
 
 room "Psychiatrickerist" tag rPsychiatrickerist
@@ -325,13 +326,26 @@ task "Get Tomato" tag tGetRottenTomato
 task "Talk to Street Starfish" tag tTalkToStreetStarfish
      in rSquare_E
      give iPickpocket
-     give iBloomers;
-
+     give iBloomers_Pink;
 task "Talk to Street Starfish" tag tTalkToStreetStarfish_ACT2
      in rSquare_E
      after INFILTRATE_CULT
      note "'Prove you're a man...'";
 
+item "Bra" tag iBra hidden in rSquare_W;
+item "Handshake" tag iHandshake keep
+     hidden in rSquare_E;
+task "Give Bloomers to Street Starfish" tag tGiveBloomersToStreetStarfish
+     in rSquare_E
+     after tTalkToStreetStarfish_ACT2
+     need iBloomers_ACT2 lose it
+     goto rSquare_W
+     give iBra
+     give iHandshake;
+
+task "Use Bra on Ladder" tag tUseBraOnLadder in any
+     need iBra lose it
+     need iLadder;
 
 ################################################################################
 map "Street";
@@ -396,7 +410,7 @@ task "Use Pickpocket on Barber" tag tUsePickpocketOnBarber
 
 item "Tooth" tag iTooth
      hidden in rBarber
-     note "A Gold Tooth";
+     note "Dunnyman's golden item.";
 task "Talk to Barber" tag tTalkToBarber_ACT2
      in rBarber
      after tGiveDonutToDunnyman
@@ -442,6 +456,17 @@ room "Dressing Room" tag rDressingRoom
 item "Mirror" tag iMirror
      in rDressingRoom
      note "Put mirror in POCKET not in LUGGAGE";
+
+task "Use Garbage Can on Fool" tag tUseGarbageCanOnFool
+     in rThroneRoom
+     need iGarbageCan lose it;
+task "Use Bubble Bath on Bath" tag tUseBubbleBathOnBath
+     in rDressingRoom
+     after tUseGarbageCanOnFool
+     need iBubbleBath lose it;
+item "Cap" tag iCap hidden in rDressingRoom
+     after tUseBubbleBathOnBath
+     note "Fool's golden item.";
 
 ################################################################################
 map "Broken Drum";
@@ -546,13 +571,30 @@ room "Shades (W)" tag rShades_W style PATH
 
 room "Shades" tag rShades style PATH
      dir ne from rShades_W;
-item "Mural" tag iMural;
+item "Mural" tag iMural in rShades;
+
+item "Trowel" tag iTrowel hidden in rShades
+     note "Mason's golden item.";
+task "Use Handshake on Mason" tag tUseHandshakeOnMason
+     need iHandshake
+     after INFILTRATE_CULT
+     give iTrowel;
+
 
 room "Shades (E)" tag rShades_E style PATH
      dir se from rShades;
 
 room "Hovel" tag rHovel
-     dir e from rShades_E nolink;
+     dir e from rShades_E
+     leave iLadder
+     after tUseLadderOnHovel;
+
+item "Skeleton Key" tag iSkeletonKey in rHovel
+     note "Thief's golden item";
+task "Tickle Thief with Feather" tag tTickleThief
+     in rHovel
+     need iFeather
+     get iSkeletonKey;
 
 room "Cathouse" tag rCathouse
      dir n from rShades_E;
@@ -644,26 +686,49 @@ room "Street (East)" tag rStreet_E_Night
 ################################################################################
 map "Shades (Night)";
 
-room "Shades (W)" tag rShades_W_Night style PATH
+room "Shades (Night) (W)" tag rShades_W_Night style PATH
      exit s
      join rAnkhMorpork_Night after tTalkToPeasant;
 
-room "Shades" tag rShades_Night style PATH
+room "Shades (Night)" tag rShades_Night style PATH
      dir ne from rShades_W_Night;
 
-room "Shades (E)" tag rShades_E_Night style PATH
+room "Shades (Night) (E)" tag rShades_E_Night style PATH
      dir se from rShades_Night;
 
-room "Hovel" tag rHovel_Night
+room "Hovel (Night)" tag rHovel_Night
      dir e from rShades_E_Night need iLadder;
 
-room "Cathouse" tag rCathouse_Night
+room "Cathouse (Night)" tag rCathouse_Night
      dir n from rShades_E_Night;
 
 task "Talk to Big Sally" tag tTalkToBigSally
      in rCathouse_Night
      after tReadGraffiti
      note "Milk, egg, flour";
+
+task "Give Coconut to Big Sally" tag tGiveCoconutToBigSally
+     in rCathouse_Night
+     after tTalkToBigSally
+     after tUseScrewdriverOnCoconut
+     need iCoconut lose it;
+task "Give Cornflour to Big Sally" tag tGiveCornflourToBigSally
+     in rCathouse_Night
+     after tTalkToBigSally
+     need iCornflour lose it;
+task "Give Egg to Big Sally" tag tGiveEggToBigSally
+     in rCathouse_Night
+     after tTalkToBigSally
+     need iEgg lose it;
+
+item "Bloomers" tag iBloomers_ACT2
+     hidden in rCathouse_Night;
+
+task "BIG SALLY SPECIAL" tag BIG_SALLY_SPECIAL in any
+     after tGiveCoconutToBigSally
+     after tGiveCornflourToBigSally
+     after tGiveEggToBigSally
+     give iBloomers_ACT2;
 
 ################################################################################
 map "Drum (Night)";
@@ -735,7 +800,7 @@ room "Pass" tag rPass
      join rDiscworld
      note "The pass is hidden in the mountains.";
 item "Egg" tag iEgg in rPass;
-item "Feather" tag iFeather in rPass;
+item "Feather" tag iFeather in rPass keep;
 
 
 ################################################################################
@@ -811,7 +876,7 @@ task "INFILTRATE CULT" tag INFILTRATE_CULT in any
      after ACT2_BEGIN
      note "Cultists are: Fool, Dunnyman, Fishmonger, Sweep, Thief, Mason";
 
-task "Go to Discworld" tag GOTO_DISCWORLD in any
+task "GO TO DISCWORLD" tag GOTO_DISCWORLD in any
      follow tGiveGatePassToGuard
      goto rDiscworld;
 join rDiscworld to rCityGate after GOTO_DISCWORLD;
@@ -821,7 +886,25 @@ task "Use Screwdriver on Coconut" tag tUseScrewdriverOnCoconut in any
      need iCoconut
      note "'Ah, now I can get at the milk.'";
 
-task "Give Coconut to Big Sally" tag tGiveCoconutToBigSally
-     in rCathouse_Night
-     after tTalkToBigSally
-     need iCoconut lose it;
+task "Use Ladder on Hovel" tag tUseLadderOnHovel in rShades_E
+     need iLadder
+     after tUseBraOnLadder;
+
+
+task "Give Tooth to Dragon" tag tGiveToothToDragon in rBarn
+     need iTooth lose it;
+task "Give Brush to Dragon" tag tGiveBrushToDragon in rBarn
+     need iBrush lose it;
+task "Give Key to Dragon" tag tGiveKeyToDragon in rBarn
+     need iSkeletonKey lose it;
+task "Give Trowel to Dragon" tag tGiveTrowelToDragon in rBarn
+     need iTrowel lose it;
+task "Give Cap to Dragon" tag tGiveCapToDragon in rBarn
+     need iCap lose it;
+
+task "-- END OF ACT 2 --" tag ACT2_END in any
+     after tGiveToothToDragon
+     after tGiveBrushToDragon
+     after tGiveKeyToDragon
+     after tGiveTrowelToDragon
+     after tGiveCapToDragon;
