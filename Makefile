@@ -91,6 +91,7 @@ pngdot: $(PNGDOTFILE)
 		-e's:^\([[:space:]]*graph\)://\1:g' \
 		-e's:^\([[:space:]]*rankdir\)://\1:g' \
 		-e's:^\([[:space:]]*rotate\)://\1:g' \
+		-e's:^\([[:space:]]*concentrate\)://\1:g' \
 		$@
 
 %.ps: %.dot
