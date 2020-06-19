@@ -103,6 +103,9 @@ pngdot: $(PNGDOTFILE)
 %.png: %.dot
 	@$(REPORT)
 	dot -Tpng -o $@ $<
+%.pdf: %.dot
+	@$(REPORT)
+	dot -Tpdf -o $@ $<
 
 %.pdf: %.ps
 	@$(REPORT)

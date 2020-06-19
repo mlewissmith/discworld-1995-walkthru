@@ -10,8 +10,10 @@ keep_unused_items = true;
 
 task_graph_rooms   = false;
 task_graph_orphans = false;
-task_graph_node    = "shape=box, style=filled, color=lightgray, fontname=sans";
-
+task_graph_font    = "sans";
+task_graph_attr    = "/*MILS GRAPH ATTR*/";
+task_graph_node    = "shape=box, style=filled, color=lightgray /*MILS NODE ATTR*/";
+task_graph_link    = "/*MILS EDGE ATTR*/";
 
 task "-- ACT 1 --" tag ACT1_BEGIN;
 
@@ -175,6 +177,11 @@ room "Alley (North)" tag rAlley_N
      exit nw;
 item "Magic Slab";
 
+task "Talk to Assassin" tag tTalkToAssassin tag INCRIMINATE_DONKEY in rAlley_N
+     after tCutLadder
+     after SORE_ASS
+     note "'Did you get the number of that Donkey cart...?' 'SORE-ASS'";
+
 room "Alley (South)" tag rAlley_S
      style PATH
      dir se from rAlley_N;
@@ -210,6 +217,11 @@ task "Put Doll in Chimney" tag tPutDollInChimney
      in rAlleyRooftops
      need iDoll lose it
      after INFILTRATE_CULT;
+
+item "Ladder 2" tag iLadder2 hidden in rAlleyRooftops;
+task "Cut Ladder" tag tCutLadder in rAlleyRooftops
+     need iKnife
+     give iLadder2;
 
 room "Alchemist" tag rAlchemist
      dir n from rAlley_S;
@@ -266,6 +278,12 @@ task "Look at Bumper Bar" tag tLookAtBumperBar in rLiveryStable
 task "Look at Bumper Sticker" tag tLookAtBumperSticker in rLiveryStable
      after tLookAtBumperBar
      note "'Whinny if you love dragons!  Lady Ramkin's Sunnyvale Dragon Sanctuary.'";
+task "Use Brush on Bumper Bar" tag tUseBrushOnBumperBar in rLiveryStable
+     after tLookAtBumperBar
+     need iSoapyBrush;
+task "Look at Number Plate" tag tLookAtNumberPlate tag SORE_ASS in rLiveryStable
+     after tUseBrushOnBumperBar
+     note "'SORE-ASS'";
 
 ################################################################################
 map "Square";
@@ -322,13 +340,17 @@ task "Use Paper Bag" tag tUsePaperBag in any
      need iPaperBag
      give iLeech;
 
-
 item "Carpet" tag iCarpet hidden in rSquare keep;
 item "Custard Book" tag iCustardBook hidden in rSquare keep;
 task "Talk to Nanny Ogg" tag tTalkToNannyOgg after RELEASE_DRAGON
      in rSquare
      give iCarpet
      get iCustardBook;
+
+item "Snake" tag iSnake hidden in rSquare;
+task "Get Egg" tag tGetEgg in rSquare
+     after ACT3_BEGIN
+     get iSnake;
 
 
 room "DunnyKing" tag rDunnyKing
@@ -375,6 +397,14 @@ task "Give Bloomers to Street Starfish" tag tGiveBloomersToStreetStarfish
 task "Use Bra on Ladder" tag tUseBraOnLadder in any
      need iBra lose it
      need iLadder;
+
+item "Moustache" tag iMoustache hidden in rSquare_E
+     after ACT3_HEROQUEST;
+task "Use Scissors on Tail" tag tUseScissorsOnTail in rSquare_E
+     after INCRIMINATE_DONKEY
+     need iScissors
+     give iMoustache;
+
 
 ################################################################################
 map "Street";
@@ -470,6 +500,9 @@ task "Use Apparatus" tag tUseApparatus
      after tGiveNoteToBarber
      give iTooth;
 
+item "Appointment Book" tag iAppointmentBook in rBarber after ACT3_BEGIN;
+item "Scissors" tag iScissors in rBarber after ACT3_BEGIN keep;
+
 ################################################################################
 map "Palace";
 
@@ -504,6 +537,12 @@ room "Dressing Room" tag rDressingRoom
 item "Mirror" tag iMirror
      in rDressingRoom
      note "Put mirror in POCKET not in LUGGAGE";
+item "Scrubbing Brush" tag iScrubbingBrush hidden in rDressingRoom after ACT3_BEGIN;
+item "Soapy Brush" tag iSoapyBrush hidden in rDressingRoom keep;
+task "Use Brush on Pot" tag tUseBrushOnPot in any
+     need iScrubbingBrush lose it
+     need iPotOfSoapyWater lose it
+     give iSoapyBrush;
 
 task "Use Garbage Can on Fool" tag tUseGarbageCanOnFool
      in rThroneRoom
@@ -579,8 +618,14 @@ room "Inn" tag rInnRoom
      dir n from rInnCourtyard
      after ACT2_BEGIN;
 item "Sheet" tag iSheet in rInnRoom after ACT2_BEGIN keep;
+
 room "Inn Bathroom" tag rInnBathroom dir e from rInnRoom;
 item "Bubble Bath" tag iBubbleBath in rInnBathroom keep;
+item "Pot of Soapy Water" tag iPotOfSoapyWater hidden in rInnBathroom;
+
+task "Use Pot with Soap" tag tUsePotWithSoap in rInnBathroom
+     need iPotOfWater lose it
+     give iPotOfSoapyWater;
 
 
 ################################################################################
@@ -654,6 +699,10 @@ task "Use Feather with Thief" tag tTickleThief
      need iFeather
      get iSkeletonKey;
 
+item "Knife" tag iKnife hidden in rHovel keep;
+task "Open Bag" tag tOpenBagInHovel in rHovel after ACT3_BEGIN
+     get iKnife;
+
 room "Cathouse" tag rCathouse
      dir n from rShades_E;
 
@@ -666,6 +715,35 @@ room "Hide-out" tag rHideout
 task "Use Knocker" tag tUseKnocker_ACT3 in rHideout after ACT3_BEGIN;
 item "Custard Tart" tag iCustardTart after tUseKnocker_ACT3;
 
+
+################################################################################
+map "Lady Ramkin's Dragon Sanctuary";
+
+room "Dragon Sanctuary Gate" tag rDragonSanctuaryGate
+     style PATH
+     join rAnkhMorpork after tLookAtBumperSticker
+     exit sw;
+
+room "Dragon Sanctuary House" tag rDragonSanctuaryHouse
+     style PATH
+     dir n e from rDragonSanctuaryGate;
+
+task "Knock on Door" tag tKnockOnDoor in rDragonSanctuaryHouse;
+task "Talk to Lady Ramkin" tag tTalkToLadyRamkin in rDragonSanctuaryHouse
+     follow tKnockOnDoor;
+
+room "Dragon Pen" tag rDragonPen
+     dir nw e from rDragonSanctuaryHouse
+     after tTalkToLadyRamkin;
+item "Rosette" tag iRosette in rDragonPen;
+item "Leash" tag iLeash in rDragonPen keep;
+item "Nail" tag iNail in rDragonPen need iLeash;
+
+task "Look at Rosette" tag tLookAtRosette in rDragonPen;
+task "Knock on Door" tag tKnockOnDoor_2 in rDragonSanctuaryHouse
+     after tLookAtRosette
+     note "Do NOT talk to Lady Ramkin."
+     get iRosette;
 
 ################################################################################
 map "Unseen University (Night)";
@@ -898,6 +976,22 @@ task "Use Pot with Cauldron" tag tUsePotWithCauldron in rNannyOggsCottage
      give iPotOfCustard;
 
 
+################################################################################
+map "Woods";
+
+room "Woods" tag rWoods_W style PATH
+     exit w
+     join rDiscworld;
+
+room "Woods" tag rWoods
+     dir e from rWoods_W;
+item "Wishing Well" in rWoods;
+item "Pot of Water" tag iPotOfWater hidden in rWoods;
+
+task "Turn Crank" tag tTurnCrank in rWoods;
+task "Use Pot on Bucket" tag tUsePotOnBucket
+     need iPot give iPotOfWater
+     after ACT3_BEGIN;
 
 ################################################################################
 ## MISSION OBJECTIVES
@@ -1034,3 +1128,7 @@ task "Talk to Nobby" tag ACT3_HEROQUEST in rCityGate
      after ACT3_HEROQUEST_WIZARDS
      after ACT3_HEROQUEST_SALLY
      note "Talisman, moustache, birthmark, spell, camel-flage, sword.";
+
+
+task "-- END OF ACT 3 --" tag ACT3_END in any
+     need iMoustache;
